@@ -1,6 +1,6 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
-#include <chrono>
+#include <sys/time.h>
 
 #define CHECK(call) \
 { \
@@ -11,6 +11,82 @@
     printf("code:%d, reason: %s\n", error, cudaGetErrorString(error)); \
     exit(1); \
   } \
+}
+
+void checkResult(float *hostRef, float *gpuRef, const int N)
+{
+    double epsilon = 1.0E-8;
+    bool match = 1;
+
+    for (int i = 0; i < N; i++)
+    {
+        if (abs(hostRef[i] - gpuRef[i]) > epsilon)
+        {
+            match = 0;
+            printf("Arrays do not match!\n");
+            printf("host %5.2f gpu %5.2f at current %d\n", hostRef[i],
+                   gpuRef[i], i);
+            break;
+        }
+    }
+
+    if (match) printf("Arrays match.\n\n");
+
+    return;
+}
+
+void sumMatrixOnHost(float *A, float *B, float *C, const int nx,
+  const int ny)
+{
+  float *ia = A;
+  float *ib = B;
+  float *ic = C;
+
+  for (int iy = 0; iy < ny; iy++)
+  {
+    for (int ix = 0; ix < nx; ix++)
+    {
+      ic[ix] = ia[ix] + ib[ix];
+    }
+
+    ia += nx;
+    ib += nx;
+    ic += nx;
+  }
+
+  return;
+}
+
+void initialData(float *ip, const int size)
+{
+    int i;
+
+    for(i = 0; i < size; i++)
+    {
+        ip[i] = (float)(rand() & 0xFF ) / 10.0f;
+    }
+
+    return;
+}
+
+inline double cpuSecond()
+{
+    struct timeval tp;
+    struct timezone tzp;
+    int i = gettimeofday(&tp, &tzp);
+    return ((double)tp.tv_sec + (double)tp.tv_usec * 1.e-6);
+}
+
+// grid 2D block 2D
+__global__ void sumMatrixOnGPU2D(float *MatA, float *MatB, float *MatC, int nx,
+  int ny)
+{
+  unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
+  unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
+  unsigned int idx = iy * nx + ix;
+
+  if (ix < nx && iy < ny)
+    MatC[idx] = MatA[idx] + MatB[idx];
 }
 
 int main(int argc, char **argv) {
