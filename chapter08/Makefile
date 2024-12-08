@@ -5,23 +5,23 @@ C_APPS=simple-data simple-kernels simple-parallel
 all: ${C_APPS} ${CU_APPS}
 
 cublas: cublas.cu
-	nvcc -O2 -arch=sm_20 -lcublas -o cublas cublas.cu
+	nvcc -O2 -arch=sm_80 -lcublas -o cublas cublas.cu
 cuda-openacc: cuda-openacc.cu
-	nvcc -O2 -arch=sm_20 -lcublas -lcurand -o cuda-openacc cuda-openacc.cu
+	nvcc -O2 -arch=sm_80 -lcublas -lcurand -o cuda-openacc cuda-openacc.cu
 cufft-multi: cufft-multi.cu
-	nvcc -O2 -arch=sm_20 -lcufft -o cufft-multi cufft-multi.cu
+	nvcc -O2 -arch=sm_80 -lcufft -o cufft-multi cufft-multi.cu
 cufft: cufft.cu
-	nvcc -O2 -arch=sm_20 -lcufft -o cufft cufft.cu
+	nvcc -O2 -arch=sm_80 -lcufft -o cufft cufft.cu
 cusparse: cusparse.cu
-	nvcc -O2 -arch=sm_20 -lcusparse -o cusparse cusparse.cu
+	nvcc -O2 -arch=sm_80 -lcusparse -o cusparse cusparse.cu
 rand-kernel: rand-kernel.cu
-	nvcc -O2 -arch=sm_20 -lcurand -o rand-kernel rand-kernel.cu
+	nvcc -O2 -arch=sm_80 -lcurand -o rand-kernel rand-kernel.cu
 replace-rand-streams: replace-rand-streams.cu
-	nvcc -O2 -arch=sm_20 -lcurand -o replace-rand-streams replace-rand-streams.cu
+	nvcc -O2 -arch=sm_80 -lcurand -o replace-rand-streams replace-rand-streams.cu
 replace-rand: replace-rand.cu
-	nvcc -O2 -arch=sm_20 -lcurand -o replace-rand replace-rand.cu
+	nvcc -O2 -arch=sm_80 -lcurand -o replace-rand replace-rand.cu
 %: %.cu
-	nvcc -O2 -arch=sm_20 -o $@ $<
+	nvcc -O2 -arch=sm_80 -o $@ $<
 %: %.c
 	gcc -O2 -std=c99 -o $@ $<
 clean:
